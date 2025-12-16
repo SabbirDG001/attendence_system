@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 
 // --- Live API Service ---
 // Make sure your .env file in the frontend root has VITE_API_BASE_URL set to your backend URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://attendence-backend-dqbz.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const apiRequest = async (endpoint, method = 'GET', body = null) => {
     const token = localStorage.getItem('authToken');
@@ -51,6 +51,8 @@ const AdminLoginPage = ({ onLogin }) => {
     const [password, setPassword] = useState('password');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+
     const handleSubmit = async (e) => {
         e.preventDefault(); setIsLoading(true); setError('');
         try {
@@ -59,7 +61,26 @@ const AdminLoginPage = ({ onLogin }) => {
         } catch (err) { setError(err.message || 'Login failed.'); } 
         finally { setIsLoading(false); }
     };
-    return ( <div className="auth-page"><div className="auth-container"><div className="auth-header"><h1>Admin Login</h1><p>(Use admin/password)</p></div>{error && <div className="auth-error">{error}</div>}<form onSubmit={handleSubmit} className="auth-form"><div className="form-group"><label>Username</label><input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required /></div><div className="form-group"><label>Password</label><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div><button className="button-18" type="submit" disabled={isLoading}>{isLoading ? <Spinner /> : 'Login'}</button></form></div></div> );
+
+    return ( 
+        <div className="auth-page">
+            <div className="auth-container">
+                <div className="auth-header"><h1>Admin Login</h1><p>(Use admin/password)</p></div>
+                {error && <div className="auth-error">{error}</div>}
+                <form onSubmit={handleSubmit} className="auth-form">
+                    <div className="form-group">
+                        <label>Username</label>
+                        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                    </div>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    </div>
+                    <button className="button-18" type="submit" disabled={isLoading}>{isLoading ? <Spinner /> : 'Login'}</button>
+                </form>
+            </div>
+        </div> 
+    );
 };
 
 const PasswordStrengthMeter = ({ password }) => {
@@ -208,20 +229,23 @@ const AdminDashboardPage = ({ navigate, onLogout }) => {
     const [sessions, setSessions] = useState([]);
     const [pendingTeachers, setPendingTeachers] = useState([]);
     const [allTeachers, setAllTeachers] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [modalInfo, setModalInfo] = useState({ show: false, message: '', type: '' });
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
-            const [sessionData, pendingData, allData] = await Promise.all([
+            const [sessionData, pendingData, allData, allUsersData] = await Promise.all([
                 apiRequest('/sessions'),
                 apiRequest('/admin/teachers/pending'),
-                apiRequest('/admin/teachers')
+                apiRequest('/admin/teachers'),
+                apiRequest('/admin/users')
             ]);
             setSessions(sessionData);
             setPendingTeachers(pendingData);
             setAllTeachers(allData);
+            setAllUsers(allUsersData);
         } catch (err) { setModalInfo({show: true, message: err.message || 'Failed to load dashboard data.', type: 'error'});
         } finally { setIsLoading(false); }
     }, []);
@@ -241,6 +265,20 @@ const AdminDashboardPage = ({ navigate, onLogout }) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                  <h2 className="page-header">Admin Dashboard</h2>
                  <button onClick={onLogout} className="button-18" style={{backgroundColor: '#ef4444'}}>Logout</button>
+            </div>
+
+            <div className="card">
+                <h3 className="card-header">All Users</h3>
+                <div className="table-container">
+                    <table className="styled-table">
+                        <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+                        <tbody>
+                            {allUsers.length > 0 ? allUsers.map(u => (
+                                <tr key={u._id}><td>{u.name || u.username}</td><td>{u.email || 'N/A'}</td><td>{u.role}</td></tr>
+                            )) : (<tr><td colSpan="3" style={{textAlign: 'center'}}>No users found.</td></tr>)}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div className="card">
@@ -636,6 +674,8 @@ const BulkUploadPage = ({ navigate, classId, uploadType }) => {
     );
 };
 
+
+
 function App() {
     const [userRole, setUserRole] = useState(localStorage.getItem('userRole'));
     const [authToken, setAuthToken] = useState(localStorage.getItem('authToken'));
@@ -717,5 +757,6 @@ function App() {
     
     return ( <div className="app-container"><main>{renderContent()}</main></div> );
 }
+
 
 export default App;
