@@ -48,8 +48,8 @@ const LandingPage = ({ setRole }) => (
 );
 
 const AdminLoginPage = ({ onLogin, onBack }) => {
-    const [username, setUsername] = useState('admin');
-    const [password, setPassword] = useState('password');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
