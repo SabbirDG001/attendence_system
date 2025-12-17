@@ -42,11 +42,12 @@ const LandingPage = ({ setRole }) => (
         <div className="role-selection">
             <a href="#" onClick={() => setRole('admin')} className="role-card"><h2>Admin</h2></a>
             <a href="#" onClick={() => setRole('teacher')} className="role-card"><h2>Teacher</h2></a>
+            <a href="https://sabbirdg001.github.io/Student_portal/" target="_blank" rel="noopener noreferrer" className="role-card"><h2>Student Portal</h2></a>
         </div>
     </div>
 );
 
-const AdminLoginPage = ({ onLogin }) => {
+const AdminLoginPage = ({ onLogin, onBack }) => {
     const [username, setUsername] = useState('admin');
     const [password, setPassword] = useState('password');
     const [error, setError] = useState('');
@@ -64,6 +65,10 @@ const AdminLoginPage = ({ onLogin }) => {
 
     return ( 
         <div className="auth-page">
+            <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} className="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back
+            </a>
             <div className="auth-container">
                 <div className="auth-header"><h1>Admin Login</h1><p>(Use admin/password)</p></div>
                 {error && <div className="auth-error">{error}</div>}
@@ -99,7 +104,7 @@ const PasswordStrengthMeter = ({ password }) => {
     return <div className={`password-strength-meter ${getStrength()}`}><div></div><div></div><div></div><div></div></div>;
 };
 
-const TeacherAuthPage = ({ onLogin }) => {
+const TeacherAuthPage = ({ onLogin, onBack }) => {
     const [mode, setMode] = useState('login');
     const [registerStep, setRegisterStep] = useState(1);
     const [email, setEmail] = useState('');
@@ -161,7 +166,7 @@ const TeacherAuthPage = ({ onLogin }) => {
             <form onSubmit={handleLogin} className="auth-form">
                 <div className="form-group"><label>Email</label><input type="email" value={email} onChange={e => setEmail(e.target.value)} required /></div>
                 <div className="form-group"><label>Password</label><input type="password" value={password} onChange={e => setPassword(e.target.value)} required /></div>
-                <div className="auth-options"><label><input type="checkbox"/> Remember Me</label><a href="#" onClick={() => setMode('forgot')}>Forgot Password?</a></div>
+                <div className="auth-options"><div style={{ display: 'flex', alignItems: 'center'}}><input type="checkbox"/><label>Remember Me</label></div><a href="#" onClick={() => setMode('forgot')}>Forgot Password?</a></div>
                 <button className="button-18" type="submit" disabled={isLoading}>{isLoading ? <Spinner/> : 'Login'}</button>
             </form>
         );
@@ -212,6 +217,10 @@ const TeacherAuthPage = ({ onLogin }) => {
     
     return(
         <div className="auth-page">
+            <a href="#" onClick={(e) => { e.preventDefault(); onBack(); }} className="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back
+            </a>
             <div className="auth-container">
                  {modalInfo.show && <Modal message={modalInfo.message} type={modalInfo.type} onClose={() => setModalInfo({show: false})} />}
                 <div className="tabs-nav">
@@ -327,7 +336,7 @@ const AdminDashboardPage = ({ navigate, onLogout }) => {
     );
 };
 
-const TeacherDashboardPage = ({ navigate, onLogout }) => {
+const TeacherDashboardPage = ({ navigate, onLogout, userInfo }) => {
     const [classes, setClasses] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [modalInfo, setModalInfo] = useState({ show: false, message: '', type: '' });
@@ -350,7 +359,27 @@ const TeacherDashboardPage = ({ navigate, onLogout }) => {
         }
     };
 
-    return ( <div className="page-padding"> {modalInfo.show && <Modal message={modalInfo.message} type={modalInfo.type} onClose={() => setModalInfo({show: false})} />}<h2 className="page-header">Teacher Dashboard</h2><div className="button-group"><button onClick={() => navigate('addClass')} className="button-18">Add New Class</button><button onClick={onLogout} className="button-18" style={{backgroundColor: '#ef4444'}}>Logout</button></div><div className="card"><h3 className="card-header">My Classes</h3><div className="table-container"><table className="styled-table"><thead><tr><th>Class Name</th><th>Session</th><th>Actions</th></tr></thead><tbody>{classes.length > 0 ? classes.map((cls) => (<tr key={cls._id}><td>{cls.name}</td><td>{cls.session}</td><td><button onClick={() => navigate('classAttendance', { classId: cls._id })} className="button-small blue">Attendance</button><button onClick={() => navigate('attendanceReport', { classId: cls._id })} className="button-small green">View Report</button><button onClick={() => navigate('bulkUpload', { classId: cls._id, uploadType: 'CT' })} className="button-small orange">Upload CT</button><button onClick={() => navigate('bulkUpload', { classId: cls._id, uploadType: 'Attendance' })} className="button-small purple">Upload Attendance</button><button onClick={() => navigate('bulkUpload', { classId: cls._id, uploadType: 'Lab Quiz' })} className="button-small orange">Upload Lab</button><button onClick={() => handleDeleteClass(cls._id)} className="button-small red">Remove</button></td></tr>)) : (<tr><td colSpan="3" style={{ textAlign: 'center' }}>No classes found.</td></tr>)}</tbody></table></div></div></div> );
+    return ( <div className="page-padding"> {modalInfo.show && <Modal message={modalInfo.message} type={modalInfo.type} onClose={() => setModalInfo({show: false})} />}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h2 className="page-header">Teacher Dashboard</h2>
+            <div style={{display: 'flex', alignItems: 'center', gap: '1rem'}}>
+                {userInfo && <span style={{fontSize: '1rem', fontWeight: '500', color: 'var(--text-color)'}}>Welcome, {userInfo.name}!</span>}
+                <button onClick={onLogout} className="button-18" style={{backgroundColor: '#ef4444'}}>Logout</button>
+            </div>
+        </div>
+        <div className="button-group">
+            <button onClick={() => navigate('addClass')} className="button-18">Add New Class</button>
+        </div>
+        <div className="card">
+            <h3 className="card-header">My Classes</h3>
+            <div className="table-container">
+                <table className="styled-table">
+                    <thead><tr><th>Class Name</th><th>Session</th><th>Actions</th></tr></thead>
+                    <tbody>{classes.length > 0 ? classes.map((cls) => (<tr key={cls._id}><td>{cls.name}</td><td>{cls.session}</td><td><button onClick={() => navigate('classAttendance', { classId: cls._id })} className="button-small blue">Attendance</button><button onClick={() => navigate('attendanceReport', { classId: cls._id })} className="button-small green">View Report</button><button onClick={() => navigate('bulkUpload', { classId: cls._id, uploadType: 'CT' })} className="button-small orange">Upload CT</button><button onClick={() => navigate('bulkUpload', { classId: cls._id, uploadType: 'Attendance' })} className="button-small purple">Upload Attendance</button><button onClick={() => navigate('bulkUpload', { classId: cls._id, uploadType: 'Lab Quiz' })} className="button-small orange">Upload Lab</button><button onClick={() => handleDeleteClass(cls._id)} className="button-small red">Remove</button></td></tr>)) : (<tr><td colSpan="3" style={{ textAlign: 'center' }}>No classes found.</td></tr>)}</tbody>
+                </table>
+            </div>
+        </div>
+    </div> );
 };
 
 const AddClassPage = ({ navigate }) => {
@@ -679,6 +708,7 @@ const BulkUploadPage = ({ navigate, classId, uploadType }) => {
 function App() {
     const [userRole, setUserRole] = useState(localStorage.getItem('userRole'));
     const [authToken, setAuthToken] = useState(localStorage.getItem('authToken'));
+    const [userInfo, setUserInfo] = useState(null); // New state for user info
     const [page, setPage] = useState(userRole ? 'dashboard' : 'landing');
     const [pageProps, setPageProps] = useState({});
     const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -687,9 +717,10 @@ function App() {
         const role = localStorage.getItem('userRole');
         const token = localStorage.getItem('authToken');
         if (token && role) {
-            apiRequest('/verify-token').then(() => {
+            apiRequest('/verify-token').then((data) => {
                 setUserRole(role);
                 setAuthToken(token);
+                setUserInfo(data.user); // Store user info
             }).catch(() => {
                 handleLogout();
             }).finally(() => setIsAuthLoading(false));
@@ -704,6 +735,10 @@ function App() {
         setAuthToken(token);
         setUserRole(role);
         setPage('dashboard');
+        // After login, fetch user info
+        apiRequest('/verify-token').then((data) => {
+            setUserInfo(data.user);
+        }).catch(console.error);
     };
 
     const handleLogout = () => {
@@ -711,12 +746,18 @@ function App() {
         localStorage.removeItem('userRole');
         setAuthToken(null);
         setUserRole(null);
+        setUserInfo(null); // Clear user info on logout
         setPage('landing');
     };
 
     const navigate = (newPage, props = {}) => {
         setPage(newPage);
         setPageProps(props);
+    };
+
+    const handleBackToLanding = () => {
+        setUserRole(null);
+        setPage('landing');
     };
 
     const renderContent = () => {
@@ -729,8 +770,8 @@ function App() {
         }
         
         if (userRole && !authToken) {
-            if (userRole === 'admin') return <AdminLoginPage onLogin={handleLogin} />;
-            if (userRole === 'teacher') return <TeacherAuthPage onLogin={handleLogin} />;
+            if (userRole === 'admin') return <AdminLoginPage onLogin={handleLogin} onBack={handleBackToLanding} />;
+            if (userRole === 'teacher') return <TeacherAuthPage onLogin={handleLogin} onBack={handleBackToLanding} />;
         }
 
         if (userRole === 'admin' && authToken) {
@@ -743,12 +784,12 @@ function App() {
         
         if (userRole === 'teacher' && authToken) {
             switch (page) {
-                case 'dashboard': return <TeacherDashboardPage navigate={navigate} onLogout={handleLogout} />;
+                case 'dashboard': return <TeacherDashboardPage navigate={navigate} onLogout={handleLogout} userInfo={userInfo} />;
                 case 'addClass': return <AddClassPage navigate={navigate} />;
                 case 'classAttendance': return <ClassAttendancePage navigate={navigate} {...pageProps} />;
                 case 'attendanceReport': return <AttendanceReportPage navigate={navigate} {...pageProps} />;
                 case 'bulkUpload': return <BulkUploadPage navigate={navigate} {...pageProps} />;
-                default: return <TeacherDashboardPage navigate={navigate} onLogout={handleLogout} />;
+                default: return <TeacherDashboardPage navigate={navigate} onLogout={handleLogout} userInfo={userInfo} />;
             }
         }
         

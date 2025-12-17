@@ -90,3 +90,31 @@ body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 .input-group { position: relative; }
 .input-group svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-500); }
 .input-group .form-input { padding-left: 35px; }
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    font-weight: 500;
+    color: var(--white);
+    text-decoration: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    transition: background-color 0.2s;
+}
+
+.back-link:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.back-link svg {
+    transition: transform 0.2s;
+}
+
+.back-link:hover svg {
+    transform: translateX(-2px);
+}
