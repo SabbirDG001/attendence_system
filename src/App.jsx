@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 
 // --- Live API Service ---
 // Make sure your .env file in the frontend root has VITE_API_BASE_URL set to your backend URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://attendence-backend-dqbz.onrender.com/api';
 
 const apiRequest = async (endpoint, method = 'GET', body = null) => {
     const token = localStorage.getItem('authToken');
